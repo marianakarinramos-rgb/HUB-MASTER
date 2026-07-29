@@ -387,6 +387,7 @@
         // ========================================================================
         let currentUser = null;
         let userPlan = null;
+        let isAdmin = false;
 
         const loginOverlay = document.getElementById('loginOverlay');
         const appContainer = document.getElementById('appContainer');
@@ -538,7 +539,7 @@
                         data.role = 'admin';
                     }
                 }
-                const isAdmin = email === ADMIN_EMAIL && data.role === 'admin';
+                isAdmin = email === ADMIN_EMAIL && data.role === 'admin';
 
                 // Sincronizar nombre del comercio
                 if (data.nombreComercio) {
@@ -728,12 +729,16 @@
 
         // Funciones de navegación
         function cambiarPestaña(idPestaña) {
+            if (idPestaña === 'admin' && !isAdmin) return;
             ['carga', 'stock', 'catalogos', 'web', 'faltantes', 'admin'].forEach(p => {
                 const sec = document.getElementById(`sec-${p}`);
                 const tab = document.getElementById(`tab-${p}`);
                 if (sec) sec.classList.add('hidden');
                 if (tab) tab.className = "w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition flex items-center gap-3";
             });
+            if (!isAdmin) {
+                document.getElementById('tab-admin')?.classList.add('hidden');
+            }
             const secEl = document.getElementById(`sec-${idPestaña}`);
             const tabEl = document.getElementById(`tab-${idPestaña}`);
             if (secEl) secEl.classList.remove('hidden');
