@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gesto Smart Rentabilidad - Panel Centralizado</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        .auto-found { border-color: #10b981 !important; background-color: #f0fdf4 !important; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <div class="min-h-screen flex flex-col md:flex-row bg-gray-50">
+        
+        <!-- Sidebar Izquierda -->
+        <aside class="w-full md:w-72 bg-slate-900 text-white p-6 flex flex-col justify-between shrink-0 shadow-xl z-20">
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h1 class="text-xl font-bold tracking-wide flex items-center gap-2 text-blue-400">
+                        🚀 Gesto Smart <span class="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-full uppercase font-normal tracking-normal">Hub Master</span>
+                    </h1>
+                </div>
+                
+                <!-- Nombre Comercio -->
+                <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 shadow-inner">
+                    <label class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider mb-1 px-1">Comercio / Negocio</label>
+                    <input type="text" id="nombreComercio" class="bg-transparent border-0 font-bold text-sm focus:ring-0 w-full text-white px-1" value="Gesto Smart Rentabilidad">
+                </div>
+
+                <!-- Navegación Vertical -->
+                <nav class="flex flex-col space-y-1.5">
+                    <button onclick="cambiarPestaña('carga')" id="tab-carga" class="w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition bg-blue-600 text-white shadow-md flex items-center gap-3">📥 Carga Central</button>
+                    <button onclick="cambiarPestaña('stock')" id="tab-stock" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition flex items-center gap-3">📊 Stock Real</button>
+                    <button onclick="cambiarPestaña('catalogos')" id="tab-catalogos" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition flex items-center gap-3">🖼️ Catálogos e Imágenes</button>
+                    <button onclick="cambiarPestaña('web')" id="tab-web" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition flex items-center gap-3">🌐 Actualizador Web</button>
+                    <button onclick="cambiarPestaña('faltantes')" id="tab-faltantes" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition flex items-center gap-3">🔍 Reporte de Faltantes</button>
+                </nav>
+            </div>
+            
+            <div class="pt-6 border-t border-slate-800 text-xs text-slate-500 text-center">
+                Gesto Smart &copy; 2026
+            </div>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <main class="flex-1 p-6 md:p-10 overflow-y-auto max-w-7xl mx-auto w-full">
+            
+            <!-- 1. CARGA CENTRAL -->
+            <section id="sec-carga" class="block space-y-6">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                    <h2 class="text-xl font-bold text-gray-950 mb-2">Panel Central de Archivos e Imágenes</h2>
+                    <p class="text-sm text-gray-500 mb-6">Sube todos tus archivos e imágenes aquí. Presiona "Procesar e Indexar" para activar el sistema.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-green-50 p-5 rounded-xl border border-green-200 flex flex-col justify-between">
+                            <div>
+                                <span class="block font-bold text-green-800 mb-1 underline">1. Archivo STOCK</span>
+                                <p class="text-xs text-gray-600 mb-4">Columnas: sku, principal, itati, exhibido, reservado, garantia.</p>
+                            </div>
+                            <input type="file" id="centralStock" accept=".xlsx, .xls" class="text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-green-600 file:text-white hover:file:bg-green-700 cursor-pointer w-full">
+                        </div>
+                        <div class="bg-yellow-50 p-5 rounded-xl border border-yellow-200 flex flex-col justify-between">
+                            <div>
+                                <span class="block font-bold text-yellow-800 mb-1 underline">2. Archivo PRECIOS</span>
+                                <p class="text-xs text-gray-600 mb-4">Columnas: sku, descripcion, precio oferta, precio normal.</p>
+                            </div>
+                            <input type="file" id="centralPrecios" accept=".xlsx, .xls" class="text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-yellow-600 file:text-white hover:file:bg-yellow-700 cursor-pointer w-full">
+                        </div>
+                        <div class="bg-blue-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-between">
+                            <div>
+                                <span class="block font-bold text-blue-800 mb-1 underline">3. Archivo WEB (Publicados)</span>
+                                <p class="text-xs text-gray-600 mb-4">Listado de productos para cruzar (debe contener columna SKU).</p>
+                            </div>
+                            <input type="file" id="centralWeb" accept=".xlsx, .xls" class="text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer w-full">
+                        </div>
+                        <div class="bg-purple-50 p-5 rounded-xl border border-purple-200 flex flex-col justify-between">
+                            <div>
+                                <span class="block font-bold text-purple-800 mb-1 underline">4. Banco de Imágenes</span>
+                                <p class="text-xs text-gray-600 mb-4">Sube fotos nombradas con el SKU.</p>
+                            </div>
+                            <input type="file" id="centralImagenes" multiple accept="image/*" class="text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700 cursor-pointer w-full">
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end">
+                        <button onclick="procesarArchivosCentrales()" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-md">⚙️ Procesar e Indexar Insumos</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. STOCK REAL -->
+            <section id="sec-stock" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-slate-900">Calculadora de Stock Real</h2>
+                        <button id="btnDescargarStock" onclick="descargarExcelStock()" class="hidden bg-green-600 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-green-700 transition shadow-sm">💾 Descargar Excel</button>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-4">Criterio unificado: (Principal + Itatí + Exhibido) - (Reservado + Garantía) [Mínimo 0].</p>
+                    
+                    <div class="overflow-x-auto rounded-xl border border-gray-100 max-h-[600px] overflow-y-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-100 border-b border-gray-200 sticky top-0 z-10">
+                                <tr>
+                                    <th class="px-6 py-3 font-semibold text-gray-700 text-sm">SKU</th>
+                                    <th class="px-6 py-3 font-semibold text-gray-700 text-sm">Descripción</th>
+                                    <th class="px-6 py-3 font-semibold text-blue-600 text-right text-sm">Stock Real</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultadoStock" class="divide-y divide-gray-100 text-sm">
+                                <tr><td colspan="3" class="px-6 py-8 text-center text-gray-400">Esperando procesamiento de archivos en el panel central...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. CATALOGOS E IMAGENES -->
+            <section id="sec-catalogos" class="hidden space-y-6">
+                <div class="flex bg-slate-200 p-1 rounded-xl w-max space-x-1 mb-4 flex-wrap gap-y-1">
+                    <button onclick="cambiarSubTab('generar')" id="subtab-generar" class="px-4 py-2 rounded-lg text-xs font-bold bg-slate-900 text-white shadow-sm transition">🚀 Carga de Exhibición</button>
+                    <button onclick="cambiarSubTab('express')" id="subtab-express" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-300 transition">📖 Catálogo Express</button>
+                    <button onclick="cambiarSubTab('combos')" id="subtab-combos" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-300 transition">📦 Calculador de Combos</button>
+                </div>
+
+                <div id="subsec-generar" class="block bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-4">
+                    <h3 class="text-lg font-bold text-slate-900">Carga Única de Exhibición (Precio Oferta Automático)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-200 text-gray-500 font-semibold">
+                                    <th class="pb-2 w-1/6">SKU</th>
+                                    <th class="pb-2 w-2/5">DESCRIPCIÓN DEL PRODUCTO</th>
+                                    <th class="pb-2 w-1/12">CANT.</th>
+                                    <th class="pb-2 w-1/6">DEPÓSITO</th>
+                                    <th class="pb-2 w-1/6">PRECIO OFERTA</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyPrincipal" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="subsec-express" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-6">
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center border-b border-gray-100 pb-4 gap-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900">📖 Armador de Catálogo Express</h3>
+                            <p class="text-xs text-gray-500">Ingresá los SKUs para armar las tarjetas dinámicas.</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+                            <button onclick="limpiarCatalogoExpress()" class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-gray-300 transition shadow-sm w-full sm:w-auto">🧹 Limpiar Todo</button>
+                            <button onclick="exportarCatalogoEsteticoPDF()" class="bg-red-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-red-700 transition shadow-sm w-full sm:w-auto">📥 Guardar PDF A4 (3xfila)</button>
+                        </div>
+                    </div>
+                    <div id="gridCatalogo" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
+
+                <div id="subsec-combos" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-4">
+                    <div class="border-b border-gray-100 pb-2">
+                        <h3 class="text-lg font-bold text-purple-900">📦 Calculador de Combos (Suma Ofertas)</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-200 text-gray-500 font-semibold">
+                                    <th class="pb-2 w-1/4">SKUS A SUMAR</th>
+                                    <th class="pb-2 w-1/3">DESCRIPCIÓN DEL COMBO</th>
+                                    <th class="pb-2 w-1/12">DESC (%)</th>
+                                    <th class="pb-2 w-1/6">SUMA COMBO ($)</th>
+                                    <th class="pb-2 w-1/6">IMAGEN</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyCombos" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. ACTUALIZADOR WEB -->
+            <section id="sec-web" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <h2 class="text-xl font-bold text-slate-900 mb-2">Cruce Masivo y Actualización Web</h2>
+                    <p class="text-sm text-gray-500 mb-6">Vincula el stock real calculado y los precios del panel central usando el archivo base de la Web.</p>
+                    <button onclick="procesarYDescargarWeb()" id="btnProcesarWeb" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-slate-900 transition shadow-md">🚀 Ejecutar Cruce y Descargar Excel Final</button>
+                </div>
+            </section>
+
+            <!-- 5. REPORTE DE FALTANTES -->
+            <section id="sec-faltantes" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-6">
+                    <div class="border-b border-gray-100 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900">🔍 Reporte de Productos Faltantes por Publicar</h2>
+                            <p class="text-sm text-gray-500">Cruza los datos cargados: busca productos con stock neto positivo que NO estén en el archivo Web.</p>
+                        </div>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <button onclick="generarReporteFaltantesDirecto()" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition shadow-sm w-full sm:w-auto">⚙️ Calcular Faltantes</button>
+                            <button id="btnExportarFaltantes" onclick="exportarExcelFaltantes()" class="hidden bg-green-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-green-700 transition shadow-sm w-full sm:w-auto">💾 Descargar Excel</button>
+                        </div>
+                    </div>
+                    <div id="alertFaltantes" class="hidden p-4 rounded-xl font-semibold text-sm"></div>
+                    <div id="contenedorTablaFaltantes" class="hidden overflow-x-auto rounded-xl border border-gray-200 max-h-[500px] overflow-y-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead class="bg-gray-100 border-b border-gray-200 sticky top-0 z-10">
+                                <tr>
+                                    <th class="px-6 py-3 font-semibold text-gray-700 w-[15%]">SKU</th>
+                                    <th class="px-6 py-3 font-semibold text-gray-700 w-[70%]">Descripción</th>
+                                    <th class="px-6 py-3 font-semibold text-blue-600 text-center w-[15%]">Stock Disponible</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyFaltantes" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // --- BLINDAJE ---
+        const fechaVencimiento = new Date("2026-12-31T23:59:59");
+        if (new Date() > fechaVencimiento) {
+            document.body.innerHTML = `
+                <div style="text-align:center; padding:50px; font-family:sans-serif; margin-top: 15vh;">
+                    <h1 style="color:#e74c3c; font-size: 2.5rem; margin-bottom: 10px;">⚠️ Licencia Expirada</h1>
+                    <p style="font-size: 1.2rem; color: #333;">El período de uso de este panel ha finalizado.</p>
+                    <p style="color: #666;">Por favor, contactá a tu asesora técnica para gestionar la renovación del servicio.</p>
+                </div>
+            `;
+            throw new Error("Licencia expirada. Ejecución bloqueada.");
+        }
+
+        let datosGlobales = {
+            stockRaw: null, preciosRaw: null, webRaw: null, bancoImagenes: {}, mapeoSkus: {}
+        };
+        let processedStockData = [];
+        let listaFaltantesGlobal = [];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            let htmlPrincipal = "";
+            for(let i=1; i<=12; i++) {
+                htmlPrincipal += `
+                    <tr class="border-b border-gray-100">
+                        <td class="py-3 pr-2"><input type="text" class="m-sku w-full border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-blue-500 font-mono" oninput="buscarSkuManual(this, 'master')"></td>
+                        <td class="py-3 pr-2"><input type="text" class="m-desc w-full border border-gray-300 rounded-lg px-3 py-1.5 bg-gray-50 text-gray-600" readonly></td>
+                        <td class="py-3 pr-2"><input type="number" class="m-cant w-full border border-gray-300 rounded-lg px-3 py-1.5 text-center" value="1"></td>
+                        <td class="py-3 pr-2"><select class="m-ubic w-full border border-gray-300 rounded-lg px-3 py-1.5 bg-white"><option>Itatí</option><option>Principal</option></select></td>
+                        <td class="py-3"><input type="text" class="m-price w-full border border-gray-300 rounded-lg px-3 py-1.5 bg-gray-50 font-bold text-green-700" readonly></td>
+                    </tr>`;
+            }
+            document.getElementById('tbodyPrincipal').innerHTML = htmlPrincipal;
+
+            let htmlGridCatalogo = "";
+            for(let i=1; i<=12; i++) {
+                htmlGridCatalogo += `
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 flex flex-col justify-between space-y-3 card-item-catalogo" data-index="${i}">
+                        <div class="flex items-center gap-2"><span class="text-xs bg-slate-900 text-white font-bold px-2 py-1 rounded">Prod ${i}</span><input type="text" class="cat-sku-in w-full border border-gray-300 rounded-lg px-2.5 py-1 focus:outline-blue-500 font-mono text-sm" placeholder="Ingresá SKU" oninput="buscarSkuManualGrid(this, ${i})"></div>
+                        <div class="w-full h-40 border border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center overflow-hidden bg-white relative"><img id="thumb-${i}" class="hidden w-full h-full object-contain p-2"><span class="text-xs text-gray-400 font-mono" id="lbl-thumb-${i}">[Sin Imagen]</span></div>
+                        <div class="space-y-1.5"><label class="text-[11px] font-bold text-gray-400 block uppercase tracking-wider">Descripción</label><textarea class="cat-desc-in w-full border border-gray-300 rounded-lg px-2.5 py-1 bg-gray-100 text-gray-700 text-xs resize-none h-12" readonly placeholder="Se autocompleta..."></textarea></div>
+                        <div class="flex items-center justify-between gap-2"><div class="w-1/2"><label class="text-[11px] font-bold text-gray-400 block uppercase tracking-wider">Precio</label><input type="text" class="cat-price-in w-full border border-gray-300 rounded-lg px-2.5 py-1 text-sm font-bold text-green-700" placeholder="$ 0"></div><button onclick="descargarEstadoWhatsApp(${i})" class="w-1/2 bg-blue-600 text-white font-bold py-2 rounded-lg text-[11px] hover:bg-blue-700 transition shadow-sm mt-4 flex items-center justify-center gap-1">📲 Descargar WA</button></div>
+                    </tr>`;
+            }
+            document.getElementById('gridCatalogo').innerHTML = htmlGridCatalogo;
+
+            let htmlCombos = "";
+            for(let i=1; i<=6; i++) {
+                htmlCombos += `
+                    <tr class="border-b border-gray-100">
+                        <td class="py-3 pr-2"><input type="text" class="combo-sku-in w-full border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-blue-500 font-mono" placeholder="Ej: 461, 442" oninput="calcularComboDinamico(this, ${i})"></td>
+                        <td class="py-3 pr-2"><input type="text" class="combo-desc-in w-full border border-gray-300 rounded-lg px-3 py-1.5" value="Combo Comercial ${i}"></td>
+                        <td class="py-3 pr-2"><input type="number" class="combo-desc-porcentaje w-full border border-gray-300 rounded-lg px-3 py-1.5 text-center" value="0" oninput="recalcularDescuentoCombo(${i})"></td>
+                        <td class="py-3 pr-2"><input type="text" class="combo-price-in w-full border border-gray-300 rounded-lg px-3 py-1.5 font-bold text-slate-900 bg-gray-50" readonly></td>
+                        <td class="py-3 flex items-center justify-center"><div class="w-14 h-14 border border-gray-200 rounded-lg flex items-center justify-center overflow-hidden bg-gray-50 shadow-sm"><img id="thumb-combo-${i}" class="hidden w-full h-full object-cover"></div></td>
+                    </tr>`;
+            }
+            document.getElementById('tbodyCombos').innerHTML = htmlCombos;
+        });
+
+        function cambiarPestaña(idPestaña) {
+            ['carga', 'stock', 'catalogos', 'web', 'faltantes'].forEach(p => {
+                document.getElementById(`sec-${p}`).classList.add('hidden');
+                document.getElementById(`tab-${p}`).className = "w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition flex items-center gap-3";
+            });
+            document.getElementById(`sec-${idPestaña}`).classList.remove('hidden');
+            document.getElementById(`tab-${idPestaña}`).className = "w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition bg-blue-600 text-white shadow-md flex items-center gap-3";
+        }
+
+        function cambiarSubTab(idSub) {
+            ['generar', 'express', 'combos'].forEach(s => {
+                document.getElementById(`subsec-${s}`).classList.add('hidden');
+                document.getElementById(`subtab-${s}`).className = "px-4 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-300 transition";
+            });
+            document.getElementById(`subsec-${idSub}`).classList.remove('hidden');
+            document.getElementById(`subtab-${idSub}`).className = "px-4 py-2 rounded-lg text-xs font-bold bg-slate-900 text-white shadow-sm transition";
+        }
+
+        const clean = (v) => {
+            if(v === undefined || v === null) return 0;
+            let s = String(v).replace(/[$.]/g, '').replace(',', '.').trim();
+            return isNaN(parseFloat(s)) ? 0 : parseFloat(s);
+        };
+        const norm = (v) => String(v || '').replace(/\.0+$/, '').trim().toLowerCase();
+        function findHeaderIndex(headerArray, name) { return headerArray.findIndex(h => String(h || '').toLowerCase().trim().includes(name.toLowerCase().trim())); }
+
+        async function procesarArchivosCentrales() {
+            const fileStock = document.getElementById('centralStock').files[0];
+            const filePrecios = document.getElementById('centralPrecios').files[0];
+            const fileWeb = document.getElementById('centralWeb').files[0];
+            const filesImg = document.getElementById('centralImagenes').files;
+
+            if(!fileStock && !filePrecios && !fileWeb && filesImg.length === 0){ alert("Por favor, sube al menos un archivo."); return; }
+
+            const leerExcel = (file) => new Promise(res => {
+                const reader = new FileReader();
+                reader.onload = (e) => { const wb = XLSX.read(e.target.result, {type: 'array'}); res(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1})); };
+                reader.readAsArrayBuffer(file);
+            });
+
+            if (fileStock) datosGlobales.stockRaw = await leerExcel(fileStock);
+            if (filePrecios) datosGlobales.preciosRaw = await leerExcel(filePrecios);
+            if (fileWeb) datosGlobales.webRaw = await leerExcel(fileWeb);
+
+            if (filesImg.length > 0) {
+                for (let file of filesImg) {
+                    const sku = file.name.split('.')[0].trim().toLowerCase();
+                    datosGlobales.bancoImagenes[sku] = await new Promise(res => {
+                        const r = new FileReader(); r.onload = (e) => res(e.target.result); r.readAsDataURL(file);
+                    });
+                }
+            }
+
+            if(datosGlobales.preciosRaw && datosGlobales.preciosRaw.length > 0) {
+                const pRows = datosGlobales.preciosRaw;
+                const header = pRows[0].map(c => String(c || '').toLowerCase().trim());
+                const sIdx = findHeaderIndex(header, 'sku');
+                const dIdx = findHeaderIndex(header, 'descrip');
+                const oIdx = findHeaderIndex(header, 'precio oferta');
+                const nIdx = findHeaderIndex(header, 'precio normal');
+
+                datosGlobales.mapeoSkus = {};
+                pRows.slice(1).forEach(row => {
+                    if(row[sIdx] === undefined || row[sIdx] === null) return;
+                    const skuRef = norm(row[sIdx]);
+                    datosGlobales.mapeoSkus[skuRef] = { desc: row[dIdx] || 'Producto sin descripción', oferta: row[oIdx] ? clean(row[oIdx]) : 0, normal: row[nIdx] ? clean(row[nIdx]) : 0 };
+                });
+            }
+            alert("¡Insumos procesados y guardados en memoria correctamente!");
+            if(datosGlobales.stockRaw) ejecutarCalculoStock();
+        }
+
+        function generarReporteFaltantesDirecto() {
+            const stockRaw = datosGlobales.stockRaw;
+            const webRaw = datosGlobales.webRaw;
+
+            if(!stockRaw) return alert("Por favor, cargá el archivo de STOCK (1) en la Carga Central primero.");
+            if(!webRaw) return alert("Por favor, cargá el archivo WEB (3) en la Carga Central para saber qué productos ya están publicados.");
+
+            const wHeader = webRaw[0].map(c => String(c || '').toLowerCase().trim());
+            let wSkuIdx = wHeader.findIndex(key => key.includes('sku'));
+            if (wSkuIdx === -1) wSkuIdx = 0; 
+
+            const skusPublicados = new Set();
+            webRaw.slice(1).forEach(row => {
+                if(row[wSkuIdx] !== undefined && row[wSkuIdx] !== null) {
+                    const skuStr = String(row[wSkuIdx]).trim();
+                    if(skuStr !== "" && skuStr.toLowerCase() !== "sku") skusPublicados.add(skuStr.toLowerCase());
+                }
+            });
+
+            const sHeader = stockRaw[0].map(c => String(c || '').toLowerCase().trim());
+            let sSkuIdx = sHeader.findIndex(key => key.includes('sku'));
+            if(sSkuIdx === -1) sSkuIdx = 0;
+
+            let sDescIdx = sHeader.findIndex(k => k.includes('descripcion') || k.includes('descripción') || k.includes('detalle') || k.includes('articulo') || k.includes('artículo'));
+            if(sDescIdx === -1) sDescIdx = 1;
+
+            const sPrinIdx = findHeaderIndex(sHeader, 'principal');
+            const sItaIdx = findHeaderIndex(sHeader, 'itati');
+            const sExhIdx = findHeaderIndex(sHeader, 'exhibido');
+            const sResIdx = findHeaderIndex(sHeader, 'reservado') !== -1 ? findHeaderIndex(sHeader, 'reservado') : findHeaderIndex(sHeader, 'reserva');
+            const sGarIdx = findHeaderIndex(sHeader, 'garantia');
+
+            listaFaltantesGlobal = [];
+            const mapaSkusProcesados = new Set();
+            let html = "";
+
+            stockRaw.slice(1).forEach(row => {
+                if(row[sSkuIdx] === undefined || row[sSkuIdx] === null || String(row[sSkuIdx]).trim() === '') return;
+                const rawSku = String(row[sSkuIdx]).trim();
+                const cleanSku = rawSku.toLowerCase();
+
+                if(cleanSku === "sku" || mapaSkusProcesados.has(cleanSku)) return;
+
+                const descripcion = row[sDescIdx] ? String(row[sDescIdx]).trim() : "Sin descripción";
+                const p = sPrinIdx !== -1 ? clean(row[sPrinIdx]) : 0;
+                const i = sItaIdx !== -1 ? clean(row[sItaIdx]) : 0;
+                const ex = sExhIdx !== -1 ? clean(row[sExhIdx]) : 0;
+                const r = sResIdx !== -1 ? clean(row[sResIdx]) : 0;
+                const g = sGarIdx !== -1 ? clean(row[sGarIdx]) : 0;
+
+                let stockNetoCalculado = (p + i + ex) - (r + g);
+                stockNetoCalculado = Math.max(0, stockNetoCalculado);
+
+                if(stockNetoCalculado > 0 && !skusPublicados.has(cleanSku)) {
+                    listaFaltantesGlobal.push({ sku: rawSku, descripcion: descripcion, stock: stockNetoCalculado });
+                    mapaSkusProcesados.add(cleanSku);
+                    html += `<tr class="hover:bg-amber-50 border-b border-gray-100"><td class="px-6 py-3 font-mono font-medium">${rawSku}</td><td class="px-6 py-3 text-gray-600">${descripcion}</td><td class="px-6 py-3 font-bold text-center text-amber-600">${stockNetoCalculado}</td></tr>`;
+                }
+            });
+
+            const alertEl = document.getElementById('alertFaltantes');
+            const tableCont = document.getElementById('contenedorTablaFaltantes');
+            const btnExp = document.getElementById('btnExportarFaltantes');
+
+            alertEl.classList.remove('hidden');
+            if(listaFaltantesGlobal.length === 0) {
+                alertEl.className = "p-4 rounded-xl font-semibold text-sm bg-green-50 text-green-800";
+                alertEl.innerText = "¡Perfecto! No se encontraron productos con stock neto positivo que falten publicar.";
+                tableCont.classList.add('hidden'); btnExp.classList.add('hidden');
+            } else {
+                alertEl.className = "p-4 rounded-xl font-semibold text-sm bg-amber-50 text-amber-800";
+                alertEl.innerText = `Se encontraron ${listaFaltantesGlobal.length} productos con stock real que NO están publicados.`;
+                document.getElementById('tbodyFaltantes').innerHTML = html;
+                tableCont.classList.remove('hidden'); btnExp.classList.remove('hidden');
+            }
+        }
+
+        function exportarExcelFaltantes() {
+            if (listaFaltantesGlobal.length === 0) return;
+            const datosExcel = listaFaltantesGlobal.map(item => ({ "SKU Faltante": item.sku, "Descripción": item.descripcion, "Stock Disponible Real": item.stock }));
+            const worksheet = XLSX.utils.json_to_sheet(datosExcel);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Faltantes");
+            XLSX.writeFile(workbook, "productos_a_publicar.xlsx");
+        }
+
+        function buscarSkuManual(input, contexto) {
+            const val = norm(input.value); const fila = input.closest('tr');
+            if(val && datosGlobales.mapeoSkus[val]) {
+                const info = datosGlobales.mapeoSkus[val]; input.classList.add('auto-found');
+                if(contexto === 'master') { fila.querySelector('.m-desc').value = info.desc; fila.querySelector('.m-price').value = info.oferta ? `$ ${info.oferta}` : `$ ${info.normal}`; }
+            } else {
+                input.classList.remove('auto-found');
+                if(contexto === 'master') { fila.querySelector('.m-desc').value = ''; fila.querySelector('.m-price').value = ''; }
+            }
+        }
+
+        function buscarSkuManualGrid(input, index) {
+            const val = norm(input.value); const tarjeta = input.closest('.card-item-catalogo');
+            const descInput = tarjeta.querySelector('.cat-desc-in'); const priceInput = tarjeta.querySelector('.cat-price-in');
+            const imgThumb = document.getElementById(`thumb-${index}`); const lblThumb = document.getElementById(`lbl-thumb-${index}`);
+
+            if(val && datosGlobales.mapeoSkus[val]) {
+                const info = datosGlobales.mapeoSkus[val]; input.classList.add('auto-found');
+                descInput.value = info.desc; priceInput.value = info.oferta ? `$ ${info.oferta.toLocaleString('es-AR')}` : `$ ${info.normal.toLocaleString('es-AR')}`;
+                if(datosGlobales.bancoImagenes[val]) { imgThumb.src = datosGlobales.bancoImagenes[val]; imgThumb.classList.remove('hidden'); lblThumb.classList.add('hidden'); } 
+                else { imgThumb.classList.add('hidden'); lblThumb.classList.remove('hidden'); lblThumb.innerText = "[Sin Imagen]"; }
+            } else {
+                input.classList.remove('auto-found'); descInput.value = ''; priceInput.value = '';
+                imgThumb.classList.add('hidden'); lblThumb.classList.remove('hidden'); lblThumb.innerText = "[Sin Imagen]";
+            }
+        }
+
+        function limpiarCatalogoExpress() {
+            if(confirm("¿Estás seguro de que querés vaciar todo el listado del catálogo actual?")) {
+                document.querySelectorAll('.card-item-catalogo').forEach(tarjeta => {
+                    const idx = tarjeta.getAttribute('data-index');
+                    tarjeta.querySelector('.cat-sku-in').value = ''; tarjeta.querySelector('.cat-sku-in').classList.remove('auto-found');
+                    tarjeta.querySelector('.cat-desc-in').value = ''; tarjeta.querySelector('.cat-price-in').value = '';
+                    document.getElementById(`thumb-${idx}`).classList.add('hidden'); document.getElementById(`thumb-${idx}`).src = '';
+                    document.getElementById(`lbl-thumb-${idx}`).classList.remove('hidden'); document.getElementById(`lbl-thumb-${idx}`).innerText = "[Sin Imagen]";
+                });
+            }
+        }
+
+        function descargarEstadoWhatsApp(index) {
+            const tarjeta = document.querySelector(`.card-item-catalogo[data-index="${index}"]`);
+            const sku = tarjeta.querySelector('.cat-sku-in').value.trim();
+            const desc = tarjeta.querySelector('.cat-desc-in').value.trim();
+            const precio = tarjeta.querySelector('.cat-price-in').value.trim();
+            const imgNode = document.getElementById(`thumb-${index}`);
+
+            if (!sku) return alert("Ingresá un SKU válido primero.");
+
+            const renderBox = document.createElement('div');
+            renderBox.style.width = '500px'; renderBox.style.height = '500px'; renderBox.style.backgroundColor = '#ffffff'; renderBox.style.position = 'absolute'; renderBox.style.left = '-9999px'; renderBox.style.display = 'flex'; renderBox.style.flexDirection = 'column'; renderBox.style.justifyContent = 'between'; renderBox.style.padding = '20px'; renderBox.style.boxSizing = 'border-box'; renderBox.style.fontFamily = 'Arial, sans-serif';
+
+            let imgHtml = '<div style="flex-grow:1;"></div>';
+            if (!imgNode.classList.contains('hidden') && imgNode.src) { imgHtml = `<div style="flex-grow: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 20px 0;"><img src="${imgNode.src}" style="max-width: 260px; max-height: 220px; object-fit: contain;"></div>`; }
+
+            const marcaUsuario = document.getElementById('nombreComercio').value || 'MI COMERCIO';
+            renderBox.innerHTML = `<div style="background-color: #002244; color: #ffffff; text-align: center; padding: 12px; font-weight: bold; font-size: 18px; letter-spacing: 1px; border-radius: 8px; text-transform: uppercase;">${marcaUsuario}</div>${imgHtml}<div style="background-color: #f4f6f9; border: 1px solid #e1e6ed; border-radius: 12px; padding: 14px; text-align: left; margin-bottom: 5px;"><div style="font-weight: 800; font-size: 14px; color: #111827; line-height: 1.4; text-transform: uppercase;">${desc}</div><div style="font-family: monospace; font-size: 12px; color: #6b7280; margin-top: 4px; font-weight: bold;">SKU: ${sku}</div></div><div style="border-top: 3px solid #002244; display: flex; justify-content: flex-end; padding-top: 10px;"><span style="color: #ef4444; font-size: 34px; font-weight: 900;">${precio}</span></div>`;
+
+            document.body.appendChild(renderBox);
+            html2canvas(renderBox, { width: 500, height: 500, scale: 2 }).then(canvas => {
+                const link = document.createElement('a'); link.download = `WA_${sku}.png`; link.href = canvas.toDataURL('image/png'); link.click(); document.body.removeChild(renderBox);
+            });
+        }
+
+        function exportarCatalogoEsteticoPDF() {
+            const { jsPDF } = window.jspdf; const tarjetas = document.querySelectorAll('.card-item-catalogo');
+            const marcaUsuario = document.getElementById('nombreComercio').value || 'MI COMERCIO';
+
+            let htmlImpresion = `<div style="width: 760px; padding: 20px; font-family: Arial, sans-serif; background: #fff;"><div style="background-color: #002244; color: #ffffff; text-align: center; padding: 15px; font-weight: bold; font-size: 20px; border-radius: 6px; margin-bottom: 25px;">🔥 CATÁLOGO DE OFERTAS - ${marcaUsuario} 🔥</div><div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">`;
+            let contProductos = 0;
+            tarjetas.forEach((tarjeta) => {
+                const idx = tarjeta.getAttribute('data-index'); const sku = tarjeta.querySelector('.cat-sku-in').value.trim(); const desc = tarjeta.querySelector('.cat-desc-in').value.trim(); const precio = tarjeta.querySelector('.cat-price-in').value.trim(); const imgNode = document.getElementById(`thumb-${idx}`);
+                
+                if (sku !== "") {
+                    contProductos++; let imgSrcHtml = '<div style="height: 120px; display:flex; align-items:center; justify-content:center; color:#cbd5e1; font-size:11px;">[Sin Foto]</div>';
+                    if(!imgNode.classList.contains('hidden') && imgNode.src) { imgSrcHtml = `<div style="height: 120px; display:flex; align-items:center; justify-content:center; overflow:hidden;"><img src="${imgNode.src}" style="max-width: 100%; max-height: 110px; object-fit: contain;"></div>`; }
+                    htmlImpresion += `<div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; background: #ffffff; box-sizing: border-box; height: 285px;">${imgSrcHtml}<div style="background-color: #f8fafc; padding: 8px; border-radius: 6px; margin-top: 6px; flex-grow:1; display:flex; flex-direction:column; justify-content:space-between; min-height: 60px;"><div style="font-size: 8.5px; line-height: 1.3; font-weight: bold; color: #1e293b; text-transform:uppercase;">${desc}</div><div style="font-size: 7.5px; font-family: monospace; color: #64748b; margin-top: 4px;">SKU: ${sku}</div></div><div style="text-align: right; margin-top: 6px; font-weight: bold; color: #ef4444; font-size: 16px; border-top: 1px solid #f1f5f9; padding-top: 4px;">${precio}</div></div>`;
+                }
+            });
+
+            htmlImpresion += `</div></div>`;
+            if(contProductos === 0) { alert("Por favor cargá al menos un SKU válido antes de exportar."); return; }
+
+            const contenedorOculto = document.createElement('div'); contenedorOculto.style.position = 'absolute'; contenedorOculto.style.left = '-9999px'; contenedorOculto.style.width = '790px'; contenedorOculto.innerHTML = htmlImpresion; document.body.appendChild(contenedorOculto);
+
+            html2canvas(contenedorOculto, { scale: 2, useCORS: true }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png'); const pdf = new jsPDF('p', 'mm', 'a4'); const imgWidth = 210; const pageHeight = 295; const imgHeight = canvas.height * imgWidth / canvas.width; let heightLeft = imgHeight; let position = 0;
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight); heightLeft -= pageHeight;
+                while (heightLeft >= 0) { position = heightLeft - imgHeight; pdf.addPage(); pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight); heightLeft -= pageHeight; }
+                pdf.save('Catalogo_Express_A4.pdf'); document.body.removeChild(contenedorOculto);
+            });
+        }
+
+        function calcularComboDinamico(input, index) {
+            const skus = input.value.split(/[\s,]+/); let totalSuma = 0; let primeraFoto = null;
+            skus.forEach(s => { const cleanSku = norm(s); if(datosGlobales.mapeoSkus[cleanSku]) { totalSuma += datosGlobales.mapeoSkus[cleanSku].oferta || datosGlobales.mapeoSkus[cleanSku].normal; } if(!primeraFoto && datosGlobales.bancoImagenes[cleanSku]) { primeraFoto = datosGlobales.bancoImagenes[cleanSku]; } });
+            const fila = input.closest('tr'); const porcDesc = clean(fila.querySelector('.combo-desc-porcentaje').value); const precioFinal = totalSuma * (1 - (porcDesc / 100));
+            fila.querySelector('.combo-price-in').value = precioFinal ? `$ ${precioFinal.toFixed(0)}` : '$ 0';
+            const imgCombo = document.getElementById('thumb-combo-' + index);
+            if(primeraFoto) { imgCombo.src = primeraFoto; imgCombo.classList.remove('hidden'); } else { imgCombo.classList.add('hidden'); }
+        }
+
+        function recalcularDescuentoCombo(index) { const inputSku = document.querySelectorAll('.combo-sku-in')[index - 1]; if(inputSku) calcularComboDinamico(inputSku, index); }
+
+        function ejecutarCalculoStock() {
+            const rows = datosGlobales.stockRaw; if(!rows || rows.length === 0) return;
+            const header = rows[0].map(c => String(c || '').toLowerCase().trim());
+            const sSku = findHeaderIndex(header, 'sku'); const sPrin = findHeaderIndex(header, 'principal'); const sIta = findHeaderIndex(header, 'itati'); const sExh = findHeaderIndex(header, 'exhibido'); const sRes = findHeaderIndex(header, 'reservado') !== -1 ? findHeaderIndex(header, 'reservado') : findHeaderIndex(header, 'reserva'); const sGar = findHeaderIndex(header, 'garantia'); const sDesc = findHeaderIndex(header, 'descrip');
+
+            let html = ""; processedStockData = [];
+            rows.slice(1).forEach(row => {
+                if(row[sSku] === undefined || row[sSku] === null || String(row[sSku]).trim() === '') return;
+                const sku = String(row[sSku]).trim(); const desc = sDesc !== -1 && row[sDesc] ? row[sDesc] : 'N/A';
+                const p = sPrin !== -1 ? clean(row[sPrin]) : 0; const i = sIta !== -1 ? clean(row[sIta]) : 0; const ex = sExh !== -1 ? clean(row[sExh]) : 0; const r = sRes !== -1 ? clean(row[sRes]) : 0; const g = sGar !== -1 ? clean(row[sGar]) : 0;
+                
+                let stockReal = (p + i + ex) - (r + g); stockReal = Math.max(0, stockReal);
+                processedStockData.push({ SKU: sku, Descripcion: desc, StockReal: stockReal });
+                html += `<tr class="hover:bg-blue-50 border-b border-gray-100"><td class="px-6 py-4 font-mono font-medium">${sku}</td><td class="px-6 py-4 text-gray-600">${desc}</td><td class="px-6 py-4 font-bold text-right ${stockReal > 0 ? 'text-green-600' : 'text-gray-400'}">${stockReal}</td></tr>`;
+            });
+            document.getElementById('resultadoStock').innerHTML = html; document.getElementById('btnDescargarStock').classList.remove('hidden');
+        }
+
+        function descargarExcelStock() {
+            if(processedStockData.length === 0) return alert("No hay datos.");
+            const ws = XLSX.utils.json_to_sheet(processedStockData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Stock Calculated"); XLSX.writeFile(wb, "Stock_Real_GestoSmart.xlsx");
+        }
+
+        function procesarYDescargarWeb() {
+            const webRaw = datosGlobales.webRaw; const stockRaw = datosGlobales.stockRaw; const preciosRaw = datosGlobales.preciosRaw;
+            if (!webRaw || !stockRaw || !preciosRaw) return alert("Faltan insumos en el Panel Central.");
+
+            const stockMap = {}; const sHeader = stockRaw[0].map(c => String(c || '').toLowerCase().trim()); const sSku = findHeaderIndex(sHeader, 'sku'); const sPrin = findHeaderIndex(sHeader, 'principal'); const sIta = findHeaderIndex(sHeader, 'itati'); const sExh = findHeaderIndex(sHeader, 'exhibido'); const sRes = findHeaderIndex(sHeader, 'reservado') !== -1 ? findHeaderIndex(sHeader, 'reservado') : findHeaderIndex(sHeader, 'reserva'); const sGar = findHeaderIndex(sHeader, 'garantia');
+            
+            stockRaw.slice(1).forEach(row => { const s = norm(row[sSku]); if (s) { let stockCalculado = (clean(row[sPrin]) + clean(row[sIta]) + clean(row[sExh])) - (clean(row[sRes]) + clean(row[sGar])); stockMap[s] = Math.max(0, stockCalculado); } });
+
+            const precioMap = {}; const pHeader = preciosRaw[0].map(c => String(c || '').toLowerCase().trim()); const pSku = findHeaderIndex(pHeader, 'sku'); const pOfer = findHeaderIndex(pHeader, 'precio oferta'); const pWeb = findHeaderIndex(pHeader, 'precio normal');
+            preciosRaw.slice(1).forEach(row => { const s = norm(row[pSku]); if (s) { precioMap[s] = { oferta: clean(row[pOfer]), web: clean(row[pWeb]) }; } });
+
+            const wHeader = webRaw[0].map(c => String(c || '').toLowerCase().trim()); const wSku = findHeaderIndex(wHeader, 'sku');
+            const final = webRaw.slice(1).map(row => {
+                const s = norm(row[wSku]); const pInfo = precioMap[s] || { oferta: 0, web: 0 };
+                return { SKU: row[wSku] || 'Sin SKU', Stock: stockMap[s] !== undefined ? stockMap[s] : 0, 'Precio Oferta': pInfo.oferta, 'Precio Web': pInfo.web };
+            });
+
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(final), "Resultado Gesto Web"); XLSX.writeFile(wb, "Resultado_Final_Web_GestoSmart.xlsx"); alert("¡Cruce web descargado con éxito! Revisá tu Excel.");
+        }
+    </script>
+</body>
+</html>
